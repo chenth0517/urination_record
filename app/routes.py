@@ -1,9 +1,9 @@
 # 从app模块中即从__init__.py中导入创建的webapp应用
 from werkzeug.urls import url_parse
 
-from app import webapp
+from app import webapp, db
 from flask import render_template, flash, redirect, url_for, request
-from app.forms import LoginForm
+from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 
@@ -67,3 +67,19 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+
+@webapp.route('/register', methods=['GET', 'POST'])
+def register():
+    # 判断当前用户是否验证，如果通过的话返回首页
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('新用户注册成功，即将进入登录页面')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='注册', form=form)
