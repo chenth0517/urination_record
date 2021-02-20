@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <table>
+        <tr valign="top">
+            #可以更改用户头像的大小
+            <td><img src="{{ user.return_img_stream() }}"></td>
+            <td><h1>用户: {{ user.username }}</h1></td>
+        </tr>
+    </table>
+    <hr>
+    {% for post in posts %}
+    <table>
+        <tr valign="top">
+            <!-- td><img src="{{ post.author.return_img_stream() }}"></td -->
+            <td>{{ post.author.username }} 说:<br>{{ post.body }}</td>
+        </tr>
+    </table>
+    {% endfor %}
+{% endblock %}

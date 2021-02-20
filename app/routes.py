@@ -46,15 +46,15 @@ def login():
     # 验证表格中的数据格式是否正确
     if form.validate_on_submit():
         # 根据表格里的数据进行查询，如果查询到数据返回User对象，否则返回None
-        user = User.query.filter_by(username=form.username.data).first()
+        tmp_user = User.query.filter_by(username=form.username.data).first()
         # 判断用户不存在或者密码不正确
-        if user is None or not user.check_password(form.password.data):
+        if tmp_user is None or not tmp_user.check_password(form.password.data):
             # 如果用户不存在或者密码不正确就会闪现这条信息
             flash('无效的用户名或密码')
             # 然后重定向到登录页面
             return redirect(url_for('login'))
         # 这是一个非常方便的方法，当用户名和密码都正确时来解决记住用户是否记住登录状态的问题
-        login_user(user, remember=form.remember_me.data)
+        login_user(tmp_user, remember=form.remember_me.data)
         # 此时的next_page记录的是跳转至登录页面时的地址
         next_page = request.args.get('next')
         # 如果next_page记录的地址不存在那么就返回首页
@@ -81,10 +81,22 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
+        tmp_user = User(username=form.username.data, email=form.email.data)
+        tmp_user.set_password(form.password.data)
+        db.session.add(tmp_user)
         db.session.commit()
         flash('新用户注册成功，即将进入登录页面')
         return redirect(url_for('login'))
     return render_template('register.html', title='注册', form=form)
+
+
+# 用户资料
+@webapp.route('/user/<username>')
+@login_required
+def user(username):
+    tmp_user = User.query.filter_by(username=username).first_or_404()
+    posts = [
+        {'author': tmp_user, 'body': '测试Post #1号'},
+        {'author': tmp_user, 'body': '测试Post #2号'}
+    ]
+    return render_template('user.html', user=tmp_user, posts=posts)

@@ -23,14 +23,26 @@ class User(UserMixin, db.Model):
     """
     posts = db.relationship('Post', backref='author', lazy='dynamic')
 
+    # 返回格式
     def __repr__(self):
         return '<用户名:{}>'.format(self.username)
 
+    # 设置密码
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
+    # 校验密码
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    # 头像,获取本地图片流
+    def return_img_stream(self):
+        import base64
+        img_stream = ''
+        with open('E:/test/PycharmProjects/urination_record/res/images/WALL-E.jpg', 'r') as img_f:
+            img_stream = img_f.read()
+            img_stream = base64.b64encode(img_stream)
+        return img_stream
 
 
 # 发帖模型
