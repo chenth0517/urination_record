@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app.models import User
 
 
+# 登录表单
 class LoginForm(FlaskForm):
     # DataRequired，当你在当前表格没有输入而直接到下一个表格时会提示你输入
     username = StringField('用户名', validators=[DataRequired(message='请输入名户名')])
@@ -13,6 +14,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('登录')
 
 
+# 注册表单
 # For email validation support： Type "pip install email-validator" in Terminal in directory of project
 class RegistrationForm(FlaskForm):
     username = StringField('用户名', validators=[DataRequired()])

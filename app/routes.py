@@ -9,10 +9,12 @@ from app.models import User
 
 
 # 建立路由，通过路由可以执行其覆盖的方法，可以多个路由指向同一个方法。
+
+
+# 主页
 @webapp.route('/')
 @webapp.route('/index')
-# 这样，必须登录后才能访问首页了,否则会自动跳转至登录页
-@login_required
+@login_required # 这样，必须登录后才能访问首页了,否则会自动跳转至登录页
 def index():
     """
     user = {'username': 'duke'}
@@ -32,6 +34,7 @@ def index():
     return render_template('index.html', title='我的')
 
 
+# 登录
 @webapp.route('/login', methods=['GET', 'POST'])
 def login():
     # 判断当前用户是否验证，如果通过的话返回首页
@@ -63,12 +66,14 @@ def login():
     return render_template('login.html', title='登 录', form=form)
 
 
+# 登出
 @webapp.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
 
+# 新用户注册
 @webapp.route('/register', methods=['GET', 'POST'])
 def register():
     # 判断当前用户是否验证，如果通过的话返回首页

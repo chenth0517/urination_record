@@ -1,5 +1,6 @@
-import os
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# 用于SQLite数据库文件地址
+# import os
+# BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
