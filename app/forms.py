@@ -1,5 +1,6 @@
+# For form component： Type "pip install flask-wtf" in Terminal in directory of project
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,BooleanField,SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
 
 
