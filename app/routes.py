@@ -1,9 +1,11 @@
 # 从app模块中即从__init__.py中导入创建的webapp应用
+from datetime import datetime
+
 from werkzeug.urls import url_parse
 
 from app import webapp, db
 from flask import render_template, flash, redirect, url_for, request
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 
@@ -100,3 +102,28 @@ def user(username):
         {'author': tmp_user, 'body': '测试Post #2号'}
     ]
     return render_template('user.html', user=tmp_user, posts=posts, file='/static/WALL-E.jpg')
+
+
+# 更新最近请求时间
+@webapp.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
+
+
+# 编辑个人资料
+@webapp.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.about_me = form.about_me.data
+        db.session.commit()
+        flash('你的提交已变更.')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.about_me.data = current_user.about_me
+    return render_template('edit_profile.html', title='个人资料编辑', form=form)
