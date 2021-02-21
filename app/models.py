@@ -35,14 +35,16 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    """
     # 头像,获取本地图片流
     def return_img_stream(self):
         import base64
         img_stream = ''
-        with open('E:/test/PycharmProjects/urination_record/res/images/WALL-E.jpg', 'r') as img_f:
+        with open('res/images/WALL-E.jpg', 'r', encoding='utf-8') as img_f:
             img_stream = img_f.read()
             img_stream = base64.b64encode(img_stream)
         return img_stream
+    """
 
 
 # 发帖模型
