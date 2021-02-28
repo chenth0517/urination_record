@@ -101,7 +101,7 @@ def user(username):
         {'author': tmp_user, 'body': '测试Post #1号'},
         {'author': tmp_user, 'body': '测试Post #2号'}
     ]
-    return render_template('user.html', user=tmp_user, posts=posts, file='/static/WALL-E.jpg')
+    return render_template('user.html', user=tmp_user, posts=posts, file='/static/images/WALL-E.jpg')
 
 
 # 更新最近请求时间
