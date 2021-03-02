@@ -14,9 +14,18 @@ class User(UserMixin, db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
+    nickname = db.Column(db.String(32))  # 新增。昵称
+    gender = db.Column(db.String(16))  # 新增。
+    id_card = db.Column(db.String(32))  # 新增。身份证号
+    phone = db.Column(db.String(32))  # 新增。手机号
+    birthday = db.Column(db.String(32))  # 新增。生日：yyyy-mm-dd
+    region = db.Column(db.Integer)  # 新增。区域
+    drg = db.Column(db.String(64))  # 新增。主诉类型
+    type = db.Column(db.Integer, default=0)  # 新增。患者类型：1-估算，0-精确
+    description = db.Column(db.String(256))  # 新增。描述
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    about_me = db.Column(db.String(140))
+    about_me = db.Column(db.String(128))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     """
     back是反向引用,User和Post是一对多的关系，backref是表示在Post中新建一个属性author，关联的是Post中的user_id外键关联的User对象。
@@ -55,11 +64,10 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db .Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
-
 
 # 在定义完数据类型以后，在Terminal中依次执行
 # 数据库初始化指令：flask db init

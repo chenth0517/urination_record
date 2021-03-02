@@ -120,10 +120,25 @@ def edit_profile():
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
+
+        current_user.nickname = form.nickname.data
+        current_user.gender = form.gender.data
+        current_user.id_card = form.id_card.data
+        current_user.phone = form.phone.data
+        current_user.birthday = form.birthday.data
+        current_user.drg = form.drg.data
+        current_user.description = form.description.data
         db.session.commit()
         flash('你的提交已变更.')
         return redirect(url_for('edit_profile'))
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
+        form.nickname.data = current_user.nickname
+        form.gender.data = current_user.gender
+        form.id_card.data = current_user.id_card
+        form.phone.data = current_user.phone
+        form.birthday.data = current_user.birthday
+        form.drg.data = current_user.drg
+        form.description.data = current_user.description
     return render_template('edit_profile.html', title='个人资料编辑', form=form)

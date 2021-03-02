@@ -2,10 +2,10 @@
 
     {% block content %}
 
-        <h1>你好呀, {{ current_user.username }} !</h1>
+        <h1>你好呀, {{ current_user.nickname }} !</h1>
 
         {% for post in posts %}
-            <div><p>{{ post.author.username }} 说:<b>{{ post.body }}</b></p></div>
+            <div><p>{{ post.author.nickname }} 说:<b>{{ post.body }}</b></p></div>
         {% endfor %}
 
 

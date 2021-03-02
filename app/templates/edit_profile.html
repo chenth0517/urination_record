@@ -8,14 +8,65 @@
             {{ form.username.label }}<br>
             {{ form.username(size=32) }}<br>
             {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+                <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
             {{ form.about_me.label }}<br>
             {{ form.about_me(cols=50, rows=4) }}<br>
             {% for error in form.about_me.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+
+        <p>
+            {{ form.nickname.label }}<br>
+            {{ form.nickname(size=32) }}<br>
+            {% for error in form.nickname.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.gender.label }}<br>
+            {{ form.gender(size=32) }}<br>
+            {% for error in form.gender.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.id_card.label }}<br>
+            {{ form.id_card(size=32) }}<br>
+            {% for error in form.id_card.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.phone.label }}<br>
+            {{ form.phone(size=32) }}<br>
+            {% for error in form.phone.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.birthday.label }}<br>
+            {{ form.birthday(size=32) }}<br>
+            {% for error in form.birthday.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.drg.label }}<br>
+            {{ form.drg(size=32) }}<br>
+            {% for error in form.drg.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.description.label }}<br>
+            {{ form.description(size=32) }}<br>
+            {% for error in form.description.errors %}
+                <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>{{ form.submit() }}</p>
