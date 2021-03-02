@@ -14,6 +14,13 @@ class LoginForm(FlaskForm):
     submit = SubmitField('登录')
 
 
+# 微信登录表单
+class LoginFormWx(FlaskForm):
+    # DataRequired，当你在当前表格没有输入而直接到下一个表格时会提示你输入
+    username = StringField()
+    password = PasswordField()
+
+
 # 注册表单
 # For email validation support： Type "pip install email-validator" in Terminal in directory of project
 class RegistrationForm(FlaskForm):
