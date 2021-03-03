@@ -89,21 +89,11 @@ def login_wx():
         # 如果用户不存在或者密码不正确就会闪现这条信息
         flash('无效的用户名或密码')
         print('登陆失败')
-        # 然后重定向到登录页面
-        return redirect(url_for('login'))
+        return "Login fail"
     # 这是一个非常方便的方法，当用户名和密码都正确时来解决记住用户是否记住登录状态的问题
-    print('登录成功')
     login_user(tmp_user)
-    # 此时的next_page记录的是跳转至登录页面时的地址
-    next_page = request.args.get('next')
-    # 如果next_page记录的地址不存在那么就返回首页
-    if not next_page or url_parse(next_page).netloc != '':
-        next_page = url_for('index')
-    # 综上，登录后要么重定向至跳转前的页面，要么跳转至首页
-    return redirect(next_page)
-
-    # 首次登录/数据格式错误都会是在登录界面
-    return render_template('login.html', title='登 录', form=form)
+    print('登录成功')
+    return "Login success"
 
 
 # 登出
