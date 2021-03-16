@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html >
+<head>
+    <meta charset="UTF-8">
+        <title>图像识别测试页</title>
+</head>
+<body>
+    <h1>图像识别测试页</h1>
+    <form action="/ocr" enctype="multipart/form-data" method="post">
+        <input type="file" name="file">
+        <input type="submit" value="提交">
+    </form>
+    <h1>识别结果</h1>
+    <img src="{{ file }}">
+    {% for result in results %}
+        <table>
+            <tr valign="top">
+                <td>[置信度] {{ (result.confidence*100) | round(2) }}%, [文字内容] {{ result.text }}</td>
+            </tr>
+        </table>
+    {% endfor %}
+    {{ result }}
+</body>
+</html>

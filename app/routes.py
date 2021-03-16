@@ -1,7 +1,13 @@
 # 从app模块中即从__init__.py中导入创建的webapp应用
+import base64
+import json
+import os
 from datetime import datetime
 
+import cv2
+import requests
 from werkzeug.urls import url_parse
+from werkzeug.utils import secure_filename
 
 from app import webapp, db
 from flask import render_template, flash, redirect, url_for, request
@@ -189,3 +195,42 @@ def test_a():
 def test_b():
     print("Entry test_b function:")
     return "this is b"
+
+
+# OCR测试
+@webapp.route('/ocr', methods=['POST', 'GET'])
+def ocr():
+    basepath = os.path.dirname(__file__)  # 当前文件所在路径
+    print(request.method)
+    if request.method == 'POST':
+        f = request.files['file']
+        upload_path = os.path.join(basepath, 'static/uploads', secure_filename(f.filename))  # 注意：没有的文件夹要先创建
+        f.save(upload_path)
+        return redirect(url_for('ocr_result', pic_name=f.filename))
+    else:
+        return render_template('ocr.html')
+
+
+# OCR测试结果
+@webapp.route('/ocr/<pic_name>', methods=['POST', 'GET'])
+def ocr_result(pic_name):
+    basepath = os.path.dirname(__file__)  # 当前文件所在路径
+    print(request.method)
+    if pic_name != "":
+        upload_path = os.path.join(basepath, 'static/uploads', secure_filename(pic_name))
+        data = {'images': [cv2_to_base64(cv2.imread(upload_path))]}
+        headers = {"Content-type": "application/json"}
+        url = "http://127.0.0.1:8866/predict/chinese_ocr_db_crnn_mobile"
+        # 图像识别服务： hub.exe serving start -m chinese_ocr_db_crnn_mobile -p 8866
+        r = requests.post(url=url, headers=headers, data=json.dumps(data))
+        # 打印预测结果
+        results = r.json()["results"][0]["data"]
+
+        return render_template('ocr.html', results=results, file=upload_path.replace(basepath, ''))
+    else:
+        return render_template('ocr.html')
+
+
+def cv2_to_base64(image):
+    data = cv2.imencode('.jpg', image)[1]
+    return base64.b64encode(data.tostring()).decode('utf8')
