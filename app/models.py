@@ -1,7 +1,16 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import db, login
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 from flask_login import UserMixin
+
+
+# 使用Flask的Login插件
+login = LoginManager()
+login.login_view = 'login'
+
+
+db = SQLAlchemy()
 
 
 @login.user_loader

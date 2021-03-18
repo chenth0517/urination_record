@@ -9,20 +9,21 @@ import requests
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
-from app import webapp, db
-from flask import render_template, flash, redirect, url_for, request
+from app.models import db
+from flask import render_template, flash, redirect, url_for, request, Blueprint, g
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, LoginFormWx
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 
 
-# 建立路由，通过路由可以执行其覆盖的方法，可以多个路由指向同一个方法。
+# 使用蓝图建立统一路由前缀，便于nginx部署多应用
+profile = Blueprint('profile', __name__, url_prefix='/uu', static_folder='', static_url_path='')
 
 
 # 主页
-@webapp.route('/')
-@webapp.route('/index')
-@login_required # 这样，必须登录后才能访问首页了,否则会自动跳转至登录页
+@profile.route('/')
+@profile.route('/index')
+# @login_required  # 这样，必须登录后才能访问首页了,否则会自动跳转至登录页
 def index():
     print("Entry index function:")
     """
@@ -44,12 +45,12 @@ def index():
 
 
 # 登录
-@webapp.route('/login', methods=['GET', 'POST'])
+@profile.route('/login', methods=['GET', 'POST'])
 def login():
     print("Entry login function:")
     # 判断当前用户是否验证，如果通过的话返回首页
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('profile.index'))
 
     # 创建一个表单实例
     form = LoginForm()
@@ -62,14 +63,14 @@ def login():
             # 如果用户不存在或者密码不正确就会闪现这条信息
             flash('无效的用户名或密码')
             # 然后重定向到登录页面
-            return redirect(url_for('login'))
+            return redirect(url_for('profile.login'))
         # 这是一个非常方便的方法，当用户名和密码都正确时来解决记住用户是否记住登录状态的问题
         login_user(tmp_user, remember=form.remember_me.data)
         # 此时的next_page记录的是跳转至登录页面时的地址
         next_page = request.args.get('next')
         # 如果next_page记录的地址不存在那么就返回首页
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
+            next_page = url_for('profile.index')
         # 综上，登录后要么重定向至跳转前的页面，要么跳转至首页
         return redirect(next_page)
     # 首次登录/数据格式错误都会是在登录界面
@@ -77,13 +78,13 @@ def login():
 
 
 # 测试微信登录
-@webapp.route('/login_wx', methods=['GET', 'POST'])
+@profile.route('/login_wx', methods=['GET', 'POST'])
 def login_wx():
     print("Entry login_wx function:")
     # 判断当前用户是否验证，如果通过的话返回首页
     if current_user.is_authenticated:
         print("login_wx: user is already authenticated")
-        return redirect(url_for('index'))
+        return redirect(url_for('profile.index'))
 
     # 创建一个表单实例
     form = LoginFormWx()
@@ -103,20 +104,20 @@ def login_wx():
 
 
 # 登出
-@webapp.route('/logout')
+@profile.route('/logout')
 def logout():
     print("Entry logout function:")
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('profile.index'))
 
 
 # 新用户注册
-@webapp.route('/register', methods=['GET', 'POST'])
+@profile.route('/register', methods=['GET', 'POST'])
 def register():
     print("Entry register function:")
     # 判断当前用户是否验证，如果通过的话返回首页
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('profile.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
         tmp_user = User(username=form.username.data, email=form.email.data)
@@ -124,12 +125,12 @@ def register():
         db.session.add(tmp_user)
         db.session.commit()
         flash('新用户注册成功，即将进入登录页面')
-        return redirect(url_for('login'))
+        return redirect(url_for('profile.login'))
     return render_template('register.html', title='注册', form=form)
 
 
 # 用户资料
-@webapp.route('/user/<username>')
+@profile.route('/user/<username>')
 @login_required
 def user(username):
     print("Entry user function:")
@@ -138,11 +139,12 @@ def user(username):
         {'author': tmp_user, 'body': '测试Post #1号'},
         {'author': tmp_user, 'body': '测试Post #2号'}
     ]
-    return render_template('user.html', user=tmp_user, posts=posts, file='/static/images/WALL-E.jpg')
+    return render_template('user.html', user=tmp_user, posts=posts,
+                           file=profile.url_prefix + '/static/images/WALL-E.jpg')
 
 
 # 更新最近请求时间
-@webapp.before_request
+@profile.before_request
 def before_request():
     print("Entry before_request function:")
     if current_user.is_authenticated:
@@ -151,7 +153,7 @@ def before_request():
 
 
 # 编辑个人资料
-@webapp.route('/edit_profile', methods=['GET', 'POST'])
+@profile.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     print("Entry edit_profile function:")
@@ -169,7 +171,7 @@ def edit_profile():
         current_user.description = form.description.data
         db.session.commit()
         flash('你的提交已变更.')
-        return redirect(url_for('edit_profile'))
+        return redirect(url_for('profile.edit_profile'))
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
@@ -184,21 +186,21 @@ def edit_profile():
 
 
 # 编辑个人资料
-@webapp.route('/a', methods=['GET', 'POST'])
+@profile.route('/a', methods=['GET', 'POST'])
 def test_a():
     print("Entry test_a function:")
     return "this is a"
 
 
 # 编辑个人资料
-@webapp.route('/b', methods=['GET', 'POST'])
+@profile.route('/b', methods=['GET', 'POST'])
 def test_b():
     print("Entry test_b function:")
     return "this is b"
 
 
 # OCR测试
-@webapp.route('/ocr', methods=['POST', 'GET'])
+@profile.route('/ocr', methods=['POST', 'GET'])
 def ocr():
     basepath = os.path.dirname(__file__)  # 当前文件所在路径
     print(request.method)
@@ -206,13 +208,13 @@ def ocr():
         f = request.files['file']
         upload_path = os.path.join(basepath, 'static/uploads', secure_filename(f.filename))  # 注意：没有的文件夹要先创建
         f.save(upload_path)
-        return redirect(url_for('ocr_result', pic_name=f.filename))
+        return redirect(url_for('profile.ocr_result', pic_name=f.filename))
     else:
         return render_template('ocr.html')
 
 
 # OCR测试结果
-@webapp.route('/ocr/<pic_name>', methods=['POST', 'GET'])
+@profile.route('/ocr/<pic_name>', methods=['POST', 'GET'])
 def ocr_result(pic_name):
     basepath = os.path.dirname(__file__)  # 当前文件所在路径
     print(request.method)
@@ -225,8 +227,8 @@ def ocr_result(pic_name):
         r = requests.post(url=url, headers=headers, data=json.dumps(data))
         # 打印预测结果
         results = r.json()["results"][0]["data"]
-
-        return render_template('ocr.html', results=results, file=upload_path.replace(basepath, ''))
+        print(upload_path.replace(basepath, profile.url_prefix))
+        return render_template('ocr.html', results=results, file=upload_path.replace(basepath, profile.url_prefix))
     else:
         return render_template('ocr.html')
 
