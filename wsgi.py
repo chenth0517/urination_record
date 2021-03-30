@@ -1,6 +1,9 @@
-import sys
-
-sys.path.insert(0, "D:/000/urination_record")
-
+from tornado.httpserver import HTTPServer
+from tornado.wsgi import WSGIContainer
 from app import webapp
-application = webapp
+from tornado.ioloop import IOLoop
+
+
+s = HTTPServer(WSGIContainer(webapp))
+s.listen(9900)  # 监听 9900 端口
+IOLoop.current().start()

@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>登 录</h1>
-    <p>还没注册? <a href="{{ url_for('register') }}">点击注册新用户</a></p>
+    <p>还没注册? <a href="{{ url_for('profile.register') }}">点击注册新用户</a></p>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
